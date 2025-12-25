@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astola Dictionary | استولا ڈکشنری</title>
+    <meta name="description" content="Best free English to Urdu dictionary with audio, synonyms, antonyms, and high-quality translations.">
+    
+    <!-- PWA Inlined Manifest -->
+    <link rel="manifest" href="data:application/manifest+json,{
+      %22name%22:%22Astola%20Dictionary%22,
+      %22short_name%22:%22Astola%20Dict%22,
+      %22description%22:%22Best%20English-Urdu%20dictionary%20app%22,
+      %22start_url%22:%22.%22,
+      %22display%22:%22standalone%22,
+      %22background_color%22:%22%23007bff%22,
+      %22theme_color%22:%22%23007bff%22,
+      %22icons%22:[{%22src%22:%22https://cdn-icons-png.flaticon.com/512/8216/8216945.png%22,%22sizes%22:%22192x192%22,%22type%22:%22image/png%22},{%22src%22:%22https://cdn-icons-png.flaticon.com/512/8216/8216945.png%22,%22sizes%22:%22512x512%22,%22type%22:%22image/png%22}]
+    }">
+    <meta name="theme-color" content="#007bff">
+
+    <style>
+        :root { --bg: #f0f4f8; --text: #333; --card: white; --accent: #007bff; }
+        body.dark { --bg: #121212; --text: #e0e0e0; --card: #1e1e1e; --accent: #0d6efd; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; transition: 0.3s; }
+        
+        /* Simple Open Book Logo */
+        .logo-container { text-align: center; padding: 30px 0; background: linear-gradient(to bottom, #007bff, #0056b3); }
+        .open-book-img { width: 150px; height: auto; margin: 10px auto; display: block; }
+        .quran-verse { font-size: 2em; color: white; margin: 20px 0; direction: rtl; font-family: 'Traditional Arabic', serif; font-weight: bold; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
+        
+        header { text-align: center; padding: 10px; background: var(--accent); color: white; }
+        h1 { margin: 10px 0 0; font-size: 2em; }
+        .subtitle { font-size: 1.2em; opacity: 0.9; }
+        main { max-width: 900px; margin: 20px auto; padding: 20px; }
+        .search-container { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 30px; }
+        #search-box { flex: 1; min-width: 200px; padding: 14px; font-size: 18px; border: 1px solid #ccc; border-radius: 8px; }
+        button { padding: 14px 24px; font-size: 18px; background: var(--accent); color: white; border: none; border-radius: 8px; cursor: pointer; }
+        button:hover { opacity: 0.9; }
+        .features { margin-bottom: 40px; }
+        .card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        #result { padding: 30px; background: var(--card); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; margin-bottom: 40px; }
+        .top-urdu { font-size: 2.2em; direction: rtl; text-align: center; color: #28a745; font-weight: bold; margin: 0 0 15px 0; }
+        .english-word { font-size: 2em; text-align: center; margin: 0 0 20px 0; color: var(--text); }
+        .phonetic { font-size: 1.4em; text-align: center; color: #666; margin: 10px 0; }
+        body.dark .phonetic { color: #aaa; }
+        .urdu { font-size: 1.6em; direction: rtl; text-align: right; color: #28a745; font-weight: bold; margin: 30px 0; }
+        .section { margin: 25px 0; padding: 15px; background: #f8f9fa; border-left: 5px solid var(--accent); border-radius: 6px; }
+        body.dark .section { background: #2d2d2d; }
+        .definition { margin: 15px 0; font-size: 1.1em; line-height: 1.6; }
+        .example { margin: 10px 0 20px 20px; color: #555; font-style: italic; }
+        .list { display: flex; flex-wrap: wrap; gap: 10px; list-style: none; padding: 0; margin: 0; }
+        .list li { background: #e3f2fd; padding: 8px 14px; border-radius: 20px; font-size: 0.95em; }
+        body.dark .list li { background: #0d47a1; color: white; }
+        #loading { text-align: center; font-size: 1.2em; color: var(--accent); display: none; margin: 20px; }
+        
+        /* Recent Searches at bottom */
+        .recent-searches-card { background: var(--card); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-top: 40px; }
+        #history-list { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+        #history-list li { cursor: pointer; padding: 10px 16px; background: #e3f2fd; border-radius: 20px; font-size: 0.95em; }
+        body.dark #history-list li { background: #0d47a1; color: white; }
+    </style>
+</head>
+<body>
+    <div class="logo-container">
+        <img src="https://www.freeiconspng.com/uploads/book-icon-by-sonoftroll-26.png" alt="Open Book" class="open-book-img">
+        <div class="quran-verse">وَقُلْ رَّبِّ زِدْنِي عِلْمًا</div>
+    </div>
+
+    <header>
+        <h1>Astola Dictionary</h1>
+        <p class="subtitle">استولا ڈکشنری • Audio • Synonyms • Antonyms • Definitions</p>
+    </header>
+
+    <main>
+        <div class="search-container">
+            <input type="text" id="search-box" placeholder="Enter an English word (e.g., love, beautiful, island)">
+            <button id="search-btn">Search</button>
+            <button id="dark-toggle">🌙 Dark Mode</button>
+        </div>
+
+        <!-- Word of the Day (still near top) -->
+        <div class="features">
+            <div class="card">
+                <h3>Word of the Day</h3>
+                <div id="wotd">Loading...</div>
+            </div>
+        </div>
+
+        <div id="loading">Searching...</div>
+
+        <!-- Main Result (Middle) -->
+        <div id="result">
+            <div class="top-urdu" id="top-urdu-meaning">Loading Urdu meaning...</div>
+            <h2 class="english-word" id="word"></h2>
+            <p class="phonetic" id="phonetic"></p>
+            <audio id="audio" controls style="display:none; width:100%; margin:15px 0;"></audio>
+
+            <div class="urdu" id="urdu-meaning">Loading...</div>
+
+            <div class="section" id="synonyms-section" style="display:none;">
+                <h3>Synonyms (Thesaurus)</h3>
+                <ul class="list" id="synonyms"></ul>
+            </div>
+
+            <div class="section" id="antonyms-section" style="display:none;">
+                <h3>Antonyms</h3>
+                <ul class="list" id="antonyms"></ul>
+            </div>
+
+            <div class="section" id="meanings">
+                <h3>English Definitions & Examples</h3>
+            </div>
+        </div>
+
+        <!-- Recent Searches at the Bottom -->
+        <div class="recent-searches-card">
+            <h3>Recent Searches</h3>
+            <ul id="history-list"></ul>
+        </div>
+    </main>
+
+    <script>
+        // Dark Mode
+        const darkToggle = document.getElementById('dark-toggle');
+        if (localStorage.getItem('darkMode') === 'enabled') document.body.classList.add('dark');
+        darkToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark') ? 'enabled' : 'disabled');
+        });
+
+        // Elements
+        const searchBox = document.getElementById('search-box');
+        const searchBtn = document.getElementById('search-btn');
+        const result = document.getElementById('result');
+        const wordEl = document.getElementById('word');
+        const phoneticEl = document.getElementById('phonetic');
+        const audioEl = document.getElementById('audio');
+        const topUrduEl = document.getElementById('top-urdu-meaning');
+        const urduEl = document.getElementById('urdu-meaning');
+        const meaningsEl = document.getElementById('meanings');
+        const synonymsEl = document.getElementById('synonyms');
+        const antonymsEl = document.getElementById('antonyms');
+        const synonymsSection = document.getElementById('synonyms-section');
+        const antonymsSection = document.getElementById('antonyms-section');
+        const loading = document.getElementById('loading');
+        const historyList = document.getElementById('history-list');
+        const wotdEl = document.getElementById('wotd');
+
+        // Search History
+        let history = JSON.parse(localStorage.getItem('dictHistory') || '[]');
+        function updateHistory() {
+            historyList.innerHTML = '';
+            history.slice(-10).reverse().forEach(word => {
+                const li = document.createElement('li');
+                li.textContent = word;
+                li.onclick = () => { searchBox.value = word; searchWord(); };
+                historyList.appendChild(li);
+            });
+        }
+        updateHistory();
+
+        // Word of the Day with Urdu
+        async function loadWordOfTheDay() {
+            const words = ["beautiful", "freedom", "love", "happy", "knowledge", "peace", "success", "dream", "courage", "island"];
+            const index = new Date().getDate() % words.length;
+            const word = words[index];
+            wotdEl.innerHTML = `<strong>${word.charAt(0).toUpperCase() + word.slice(1)}</strong><br>Loading Urdu...`;
+            const urdu = await translateToUrdu(word);
+            wotdEl.innerHTML = `<strong>${word.charAt(0).toUpperCase() + word.slice(1)}</strong><br><span class="urdu">${urdu}</span>`;
+        }
+        loadWordOfTheDay();
+
+        // Search
+        searchBtn.addEventListener('click', searchWord);
+        searchBox.addEventListener('keypress', e => { if (e.key === 'Enter') searchWord(); });
+
+        async function searchWord() {
+            const word = searchBox.value.trim().toLowerCase();
+            if (!word) return;
+
+            loading.style.display = 'block';
+            result.style.display = 'none';
+            topUrduEl.textContent = 'Loading Urdu meaning...';
+            urduEl.textContent = 'Loading...';
+
+            if (!history.includes(word)) {
+                history.push(word);
+                localStorage.setItem('dictHistory', JSON.stringify(history));
+                updateHistory();
+            }
+
+            try {
+                const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+                if (!res.ok) throw new Error('Word not found');
+                const data = await res.json();
+                const entry = data[0];
+
+                wordEl.textContent = entry.word;
+                phoneticEl.textContent = entry.phonetic || entry.phonetics[0]?.text || '';
+
+                const audioSrc = entry.phonetics.find(p => p.audio)?.audio || '';
+                if (audioSrc) {
+                    audioEl.src = audioSrc.startsWith('http') ? audioSrc : `https:${audioSrc}`;
+                    audioEl.style.display = 'block';
+                } else audioEl.style.display = 'none';
+
+                // Synonyms and Antonyms
+                let allSyn = new Set();
+                let allAnt = new Set();
+
+                entry.meanings.forEach(meaning => {
+                    meaning.synonyms?.forEach(s => allSyn.add(s));
+                    meaning.antonyms?.forEach(a => allAnt.add(a));
+                    meaning.definitions.forEach(def => {
+                        def.synonyms?.forEach(s => allSyn.add(s));
+                        def.antonyms?.forEach(a => allAnt.add(a));
+                    });
+                });
+
+                synonymsEl.innerHTML = '';
+                if (allSyn.size > 0) {
+                    [...allSyn].sort().forEach(s => {
+                        const li = document.createElement('li');
+                        li.textContent = s;
+                        synonymsEl.appendChild(li);
+                    });
+                    synonymsSection.style.display = 'block';
+                } else synonymsSection.style.display = 'none';
+
+                antonymsEl.innerHTML = '';
+                if (allAnt.size > 0) {
+                    [...allAnt].sort().forEach(a => {
+                        const li = document.createElement('li');
+                        li.textContent = a;
+                        antonymsEl.appendChild(li);
+                    });
+                    antonymsSection.style.display = 'block';
+                } else antonymsSection.style.display = 'none';
+
+                // Definitions
+                meaningsEl.innerHTML = '<h3>English Definitions & Examples</h3>';
+                entry.meanings.forEach(meaning => {
+                    const h4 = document.createElement('h4');
+                    h4.textContent = meaning.partOfSpeech;
+                    meaningsEl.appendChild(h4);
+                    meaning.definitions.forEach((def, i) => {
+                        const div = document.createElement('div');
+                        div.className = 'definition';
+                        div.innerHTML = `<strong>${i+1}. </strong>${def.definition}`;
+                        if (def.example) {
+                            const ex = document.createElement('p');
+                            ex.className = 'example';
+                            ex.textContent = `Example: "${def.example}"`;
+                            div.appendChild(ex);
+                        }
+                        meaningsEl.appendChild(div);
+                    });
+                });
+
+                // Urdu
+                const simpleUrdu = await translateToUrdu(entry.word);
+                topUrduEl.textContent = simpleUrdu;
+
+                const fullText = entry.word + (entry.meanings[0]?.definitions[0]?.definition ? ' - ' + entry.meanings[0].definitions[0].definition : '');
+                const detailedUrdu = await translateToUrdu(fullText);
+                urduEl.textContent = detailedUrdu;
+
+                searchBox.placeholder = simpleUrdu || "Enter an English word";
+
+                result.style.display = 'block';
+            } catch (err) {
+                topUrduEl.textContent = 'Translation unavailable';
+                meaningsEl.innerHTML = `<p style="color:red;">${err.message || 'Error loading word'}</p>`;
+                urduEl.textContent = 'Translation unavailable';
+                synonymsSection.style.display = 'none';
+                antonymsSection.style.display = 'none';
+                searchBox.placeholder = "Enter an English word";
+                result.style.display = 'block';
+            }
+            loading.style.display = 'none';
+        }
+
+        async function translateToUrdu(text) {
+            try {
+                const response = await fetch('http://localhost:8000/translate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text.trim(), to: 'ur' })
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.translatedText) return data.translatedText;
+                }
+            } catch (e) {}
+
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|ur`);
+                const data = await res.json();
+                return data.responseData.translatedText || 'Urdu unavailable';
+            } catch (e) {
+                return 'Urdu translation unavailable';
+            }
+        }
+    </script>
+</body>
+</html>
